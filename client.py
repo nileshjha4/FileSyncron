@@ -32,7 +32,7 @@
 #     break
 # client.close()
 import socket
-import pdb
+import pdb,os
 import paramiko
 
 from paramiko import SSHClient
@@ -50,21 +50,21 @@ def Main1():
     # pdb.set_trace()
     
     host = '10.2.133.164'
-    port = 8081
+    port = 8083
 
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-
+    
     # connect to server on local computer
     s.connect((host,port))
-    s.sendall(bytes("purnima Ketan1411",'UTF-8'))
+    s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
 
     ssh = createSSHClient( '10.2.133.164','22', 'nilesh', '041997')
     scp = SCPClient(ssh.get_transport())
     scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
     scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
-    scp.close()
-
-      
+    scp.close()  
+    while True:
+        pass    
     s.close()
 
 Main1()
