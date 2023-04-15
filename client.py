@@ -38,12 +38,27 @@ import paramiko
 from paramiko import SSHClient
 from scp import SCPClient
 
+dir_list = []
+
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(server, port, user, password, look_for_keys=False, allow_agent=False)
     return client
+
+def dir_scanner():
+	temp = os.listdir('./temp')
+	new_files = [file for file in temp if file not in dir_list]
+	for i in new_files:
+		dir_list.append(i)
+	if len(new_files)!=0:
+		print(new_files)
+		for file in new_files:
+			ssh = createSSHClient('10.2.133.164','22', 'nilesh', '041997')
+			scp = SCPClient(ssh.get_transport())
+			scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
+			scp.close()
 
 def Main1():
     # local host IP '127.0.0.1'
@@ -64,7 +79,7 @@ def Main1():
     scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
     scp.close()  
     while True:
-        pass    
+        dir_scanner()   
     s.close()
 
 Main1()
