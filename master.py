@@ -22,15 +22,21 @@ ip_list = dict()
 dir_list = []
 
 def dir_scanner():
-	temp = os.listdir('./temp')
-	new_files = [file for file in temp if file not in dir_list]
-	if len(new_files)!=0:
-		for files in new_files:
-			for current_ip,user in ip_list.items(): 
-				ssh = createSSHClient( current_ip,'22', user[0], user[1])
-				scp = SCPClient(ssh.get_transport())
-				scp.put(files, remote_path = '/temp', recursive=True)
-				scp.close()
+	while True:
+		temp = os.listdir('./temp')
+		new_files = [file for file in temp if file not in dir_list]
+		for i in new_files:
+			dir_list.append(i)
+		if len(new_files)!=0:
+			print(new_files)
+			for file in new_files:
+				# print(file)
+				for current_ip,data in ip_list.items():
+					# print(current_ip,data)
+					ssh = createSSHClient( current_ip,'22', data[0], data[1])
+					scp = SCPClient(ssh.get_transport())
+					scp.put('./temp/'+file, remote_path = data[2], recursive=True)
+					scp.close()
 
 
 
@@ -70,7 +76,7 @@ def Main():
 	# reserve a port on your computer
 	# in our case it is 12345 but it
 	# can be anything
-	port = 8081
+	port = 8083
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 	s.bind(('0.0.0.0', port))
 	print("socket binded to port", port)
@@ -84,7 +90,7 @@ def Main():
 
 		# establish connection with client
 		c, addr = s.accept()
-		data = c.recv(1024).decode('utf-8')
+		data = c.recv(2048).decode('utf-8')
 		data1 = data.split(' ')
 		# lock acquired by client
 		# print_lock.acquire()
