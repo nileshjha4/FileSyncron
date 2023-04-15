@@ -18,7 +18,7 @@ from _thread import *
 import threading
 
 # print_lock = threading.Lock()
-ip_list = []
+ip_list = dict()
 dir_list = []
 
 def dir_scanner():
@@ -26,7 +26,7 @@ def dir_scanner():
 	new_files = [file for file in temp if file not in dir_list]
 	if len(new_files)!=0:
 		for files in new_files:
-			for current_ip in ip_list: 
+			for current_ip in ip_list.keys(): 
 				ssh = createSSHClient( current_ip,'22', 'nilesh', '041997')
 				scp = SCPClient(ssh.get_transport())
 				scp.put(files, remote_path = '/temp', recursive=True)
@@ -60,7 +60,7 @@ def threaded(c,ip):
 		c.send(data.encode('utf-8'))
 
 	# connection closed
-	ip_list.remove(ip)
+	ip_list.pop(ip)
 	c.close()
 
 
@@ -84,12 +84,13 @@ def Main():
 
 		# establish connection with client
 		c, addr = s.accept()
-
+		data = c.recv(1024).decode('utf-8')
+		data1 = data.split(' ')
 		# lock acquired by client
 		# print_lock.acquire()
 		print('Connected to :', addr[0], ':', addr[1])
 		addr
-		ip_list.append(addr[0])
+		ip_list[addr[0]] = data1
 		# Start a new thread and return its identifier
 		start_new_thread(threaded, (c,addr[0]))
 		print(ip_list)
