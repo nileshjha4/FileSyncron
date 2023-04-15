@@ -26,8 +26,8 @@ def dir_scanner():
 	new_files = [file for file in temp if file not in dir_list]
 	if len(new_files)!=0:
 		for files in new_files:
-			for current_ip in ip_list.keys(): 
-				ssh = createSSHClient( current_ip,'22', 'nilesh', '041997')
+			for current_ip,user in ip_list.items(): 
+				ssh = createSSHClient( current_ip,'22', user[0], user[1])
 				scp = SCPClient(ssh.get_transport())
 				scp.put(files, remote_path = '/temp', recursive=True)
 				scp.close()
