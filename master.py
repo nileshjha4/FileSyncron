@@ -35,7 +35,7 @@ class Master(object):
                 del_file[k].append(ip)
             # del_file[k]+=1
             if len(del_file[k]) == len(ip_list)-1:
-                del_file.erase(k)
+                del_file.pop(k)
 
         return ' '.join(temp)
         # return del_file.join(' ')
