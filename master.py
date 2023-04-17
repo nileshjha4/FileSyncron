@@ -20,6 +20,14 @@ class Master(object):
         s.bind(('0.0.0.0', port))
         c, addr = s.accept()
         del_file = c.recv(8192).decode('utf-8')
+        # file_list = msg.split(' ')[1:]
+        # for file in file_list:
+        #     file_path = './temp/' + file
+        #     try:
+        #         os.remove(file_path)
+        #     except FileNotFoundError:
+        #         print(f"File {file_path} does not exist.")
+        s.close()
         return del_file
     
 def createSSHClient(server, port, user, password):

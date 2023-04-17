@@ -40,7 +40,7 @@ from scp import SCPClient
 
 dir_list = []
 deleted_files = []
-ip_add = '10.2.133.164'
+ip_add = '10.2.129.127'
 port ='22'
 
 def createSSHClient(server, port, user, password):
@@ -55,10 +55,19 @@ def delete_file(deleted_files, s):
         del_msg = 'delete '
         for file in deleted_files:
             del_msg += str(file) + ' '
-    s.sendall(bytes(del_msg,'UTF-8'))
+    port = 8084
+    s1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    # connect to server on local computer
+    s1.connect((ip_add,port))
+    s1.sendall(bytes(del_msg,'UTF-8'))
+    s1.close()
 
 def dir_scanner(s):
     temp = os.listdir('./temp')
+    port = 8083
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    # connect to server on local computer
+    s.connect((ip_add,port))
     new_files = [file for file in temp if file not in dir_list]
     deleted_files = [file for file in dir_list if file not in temp]
     for i in new_files:
@@ -73,7 +82,7 @@ def dir_scanner(s):
     delete_file(deleted_files, s)
 
 def detect_deleted_file_from_master():
-    master = Pyro4.core.Proxy('PYRO:Master@' + ip_add + ':9090')
+    master = Pyro4.core.Proxy('PYRO:Master@' + ip_add + ':9095')
     msg = (master.check_deleted_file())
     print(msg)
     # file_list = msg.split(' ')[1:]
