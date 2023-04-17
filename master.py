@@ -11,24 +11,34 @@ import threading
 # print_lock = threading.Lock()
 ip_list = dict()
 dir_list = []
-
+del_file = {}
 @Pyro4.expose
 class Master(object):
-    def check_deleted_file(self):
-        port = 8084
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind(('0.0.0.0', port))
-        c, addr = s.accept()
-        del_file = c.recv(8192).decode('utf-8')
-        # file_list = msg.split(' ')[1:]
-        # for file in file_list:
-        #     file_path = './temp/' + file
-        #     try:
-        #         os.remove(file_path)
-        #     except FileNotFoundError:
-        #         print(f"File {file_path} does not exist.")
-        s.close()
-        return del_file
+    def check_deleted_file(self, ip):
+        # port = 8084
+        # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # s.bind(('0.0.0.0', port))
+        # c, addr = s.accept()
+        # del_file = c.recv(8192).decode('utf-8')
+        # # file_list = msg.split(' ')[1:]
+        # # for file in file_list:
+        # #     file_path = './temp/' + file
+        # #     try:
+        # #         os.remove(file_path)
+        # #     except FileNotFoundError:
+        # #         print(f"File {file_path} does not exist.")
+        # s.close()
+        temp = []
+        for k,v in del_file.items():
+            temp.append(k)
+            if ip not in del_file[k]:
+                del_file[k].append(ip)
+            # del_file[k]+=1
+            if len(del_file[k]) == len(ip_list)-1:
+                del_file.erase(k)
+
+        return ' '.join(temp)
+        # return del_file.join(' ')
     
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -56,8 +66,13 @@ def dir_scanner():
 
 # thread function
 def threaded(c,ip):
-    data = c.recv(1024).decode('utf-8')
     while True:
+        data = c.recv(8192).decode('utf-8')
+        msg = data.split(' ')
+        if msg[0] == 'delete':
+            for i in msg[1:]:
+                del_file[i]= []
+
         # data received from client
         if not data:
             print('Bye')
@@ -65,10 +80,10 @@ def threaded(c,ip):
             break
 
         # reverse the given string from client
-        data = data[::-1]
+        # data = data[::-1]
 
-        # send back reversed string to client
-        c.send(data.encode('utf-8'))
+        # # send back reversed string to client
+        # c.send(data.encode('utf-8'))
 
     # connection closed
     ip_list.pop(ip)

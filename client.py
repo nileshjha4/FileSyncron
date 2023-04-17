@@ -1,42 +1,13 @@
 
-# import paramiko
-# from scp import SCPClient
-
-# def createSSHClient(server, port, user, password):
-#     client = paramiko.SSHClient()
-#     client.load_system_host_keys()
-#     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#     client.connect(server, port, user, password, look_for_keys=False, allow_agent=False)
-#     return client
-
-# print("Enter IP address of the server")
-# ip_addr = input()
-# ssh = createSSHClient( ip, port, username, password)
-# scp = SCPClient(ssh.get_transport())
-# scp.put('LICENSE', './LICENSE')
-# scp.close()
-
-# import socket
-# SERVER = "10.2.133.164"
-# PORT = 8081
-# client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# client.connect((SERVER, PORT))
-# client.sendall(bytes("This is from Client-check",'UTF-8'))
-# while True:
-  
-#   out_data = input()
-#   client.sendall(bytes(out_data,'UTF-8'))
-#   in_data =  client.recv(1024)
-#   print("From Server :" ,in_data.decode())
-#   if out_data=='bye':
-#     break
-# client.close()
 import socket
 import pdb,os
 import paramiko
 import Pyro4
 from paramiko import SSHClient
 from scp import SCPClient
+
+hostname = socket.gethostname()
+ip = socket.gethostbyname(hostname)
 
 dir_list = []
 deleted_files = []
@@ -55,12 +26,13 @@ def delete_file(deleted_files, s):
         del_msg = 'delete '
         for file in deleted_files:
             del_msg += str(file) + ' '
-    port = 8084
-    s1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    # connect to server on local computer
-    s1.connect((ip_add,port))
-    s1.sendall(bytes(del_msg,'UTF-8'))
-    s1.close()
+    # port = 8084
+    # s1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    # # connect to server on local computer
+    # s1.connect((ip_add,port))
+    # s1.sendall(bytes(del_msg,'UTF-8'))
+    # s1.close()
+    s.sendall(bytes(del_msg, 'UTF-8'))
 
 def dir_scanner(s):
     temp = os.listdir('./temp')
@@ -83,7 +55,7 @@ def dir_scanner(s):
 
 def detect_deleted_file_from_master():
     master = Pyro4.core.Proxy('PYRO:Master@' + ip_add + ':9095')
-    msg = (master.check_deleted_file())
+    msg = (master.check_deleted_file(ip))
     print(msg)
     # file_list = msg.split(' ')[1:]
     # for file in file_list:
@@ -95,21 +67,21 @@ def detect_deleted_file_from_master():
     
     
 
-def Main1():
-    port = 8083
-    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    # connect to server on local computer
-    s.connect((ip_add,port))
-    s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
+# def Main1():
+port = 8083
+s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+# connect to server on local computer
+s.connect((ip_add,port))
+s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
 
-    ssh = createSSHClient( ip_add, port, 'nilesh', '041997')
-    scp = SCPClient(ssh.get_transport())
-    scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
-    scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
-    scp.close()  
-    while True:
-        dir_scanner(s)
-        detect_deleted_file_from_master()
-    s.close()
+ssh = createSSHClient( ip_add, port, 'nilesh', '041997')
+scp = SCPClient(ssh.get_transport())
+scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
+scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
+scp.close()  
+while True:
+    dir_scanner(s)
+    detect_deleted_file_from_master(s)
+s.close()
 
-Main1()
+# Main1()
