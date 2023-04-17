@@ -122,11 +122,13 @@ def Main():
         print(ip_list)
     s.close()
 
-
-if __name__ == '__main__':
+def pyro():
     Pyro4.Daemon.serveSimple({
     Master: 'Master',
     }, host="0.0.0.0", port=9095, ns=False, verbose=True)
+
+if __name__ == '__main__':
+    start_new_thread(pyro, ())
     Main()
     
 

@@ -53,7 +53,8 @@ def dir_scanner(s):
 def detect_deleted_file_from_master():
     master = Pyro4.core.Proxy('PYRO:Master@' + ip_add + ':9095')
     msg = (master.check_deleted_file(ip))
-    print(msg)
+    if msg != ' ':
+        print(msg)
     # file_list = msg.split(' ')[1:]
     # for file in file_list:
     #     file_path = './temp/' + file
