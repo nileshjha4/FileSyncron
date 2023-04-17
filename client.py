@@ -1,5 +1,5 @@
 
-import socket
+import socket, time
 import pdb,os
 import paramiko
 import Pyro4
@@ -81,6 +81,7 @@ scp.close()
 while True:
     dir_scanner(s)
     detect_deleted_file_from_master()
+    time.sleep(1)
 s.close()
 
 # Main1()
