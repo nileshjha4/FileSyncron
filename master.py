@@ -124,8 +124,11 @@ def Main():
 
 
 if __name__ == '__main__':
+    Pyro4.Daemon.serveSimple({
+    Master: 'Master',
+    }, host="0.0.0.0", port=9095, ns=False, verbose=True)
     Main()
-
+    
 
 
 

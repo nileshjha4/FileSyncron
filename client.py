@@ -12,7 +12,7 @@ ip = socket.gethostbyname(hostname)
 dir_list = []
 deleted_files = []
 ip_add = '10.2.129.127'
-port ='22'
+# port ='22'
 
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -26,20 +26,17 @@ def delete_file(deleted_files, s):
         del_msg = 'delete '
         for file in deleted_files:
             del_msg += str(file) + ' '
+        s.sendall(bytes(del_msg, 'UTF-8'))
     # port = 8084
     # s1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     # # connect to server on local computer
     # s1.connect((ip_add,port))
     # s1.sendall(bytes(del_msg,'UTF-8'))
     # s1.close()
-    s.sendall(bytes(del_msg, 'UTF-8'))
+    
 
 def dir_scanner(s):
     temp = os.listdir('./temp')
-    port = 8083
-    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    # connect to server on local computer
-    s.connect((ip_add,port))
     new_files = [file for file in temp if file not in dir_list]
     deleted_files = [file for file in dir_list if file not in temp]
     for i in new_files:
@@ -47,7 +44,7 @@ def dir_scanner(s):
     if len(new_files)!=0:
         print(new_files)
         for file in new_files:
-            ssh = createSSHClient(ip_add, port, 'nilesh', '041997')
+            ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
             scp = SCPClient(ssh.get_transport())
             scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
             scp.close()
@@ -69,19 +66,20 @@ def detect_deleted_file_from_master():
 
 # def Main1():
 port = 8083
+# pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
 s.connect((ip_add,port))
 s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
 
-ssh = createSSHClient( ip_add, port, 'nilesh', '041997')
+ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
 scp = SCPClient(ssh.get_transport())
 scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
 scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
 scp.close()  
 while True:
     dir_scanner(s)
-    detect_deleted_file_from_master(s)
+    detect_deleted_file_from_master()
 s.close()
 
 # Main1()
