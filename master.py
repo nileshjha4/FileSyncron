@@ -10,29 +10,18 @@ from _thread import *
 import threading
 # print_lock = threading.Lock()
 ip_list = dict()
-dir_list = []
-del_file = {}
+# dir_list = []
+# del_file = {}
 
 @Pyro5.api.expose
 class Master(object):
     # @classmethod
     def __init__(self):
         self.del_files = dict()
+        self.dir_list = []
 
     def check_deleted_file(self):
-        # port = 8084
-        # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # s.bind(('0.0.0.0', port))
-        # c, addr = s.accept()
-        # del_file = c.recv(8192).decode('utf-8')
-        # # file_list = msg.split(' ')[1:]
-        # # for file in file_list:
-        # #     file_path = './temp/' + file
-        # #     try:
-        # #         os.remove(file_path)
-        # #     except FileNotFoundError:
-        # #         print(f"File {file_path} does not exist.")
-        # s.close()
+
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
@@ -43,12 +32,16 @@ class Master(object):
 
                 if len(self.del_files[k]) == len(ip_list):
                     print(self.del_files[k])
-                    print("==========", k)
+                    # print("==========", k)
                     # self.del_files.pop(k)
                     del self.del_files[k]
-                    print("------------", len(self.del_files))
+                    # print("------------", len(self.del_files))
+                    print('--> Deleted',k)
 
         return ' '.join(temp)
+    
+    def check_added_file(self):
+        return ' '.join(self.dir_list)
     
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -60,19 +53,19 @@ def createSSHClient(server, port, user, password):
 def dir_scanner():
     while True:
         temp = os.listdir('./temp')
-        new_files = [file for file in temp if file not in dir_list]
+        new_files = [file for file in temp if file not in obj.dir_list]
         for i in new_files:
-            dir_list.append(i)
-        if len(new_files)!=0:
-            print(new_files)
-            for file in new_files:
-                # print(file)
-                for current_ip,data in ip_list.items():
-                    # print(current_ip,data)
-                    ssh = createSSHClient( current_ip,'22', data[0], data[1])
-                    scp = SCPClient(ssh.get_transport())
-                    scp.put('./temp/'+file, remote_path = data[2], recursive=True)
-                    scp.close()
+            obj.dir_list.append(i)
+        # if len(new_files)!=0:
+        #     print(new_files)
+        #     for file in new_files:
+        #         # print(file)
+        #         for current_ip,data in ip_list.items():
+        #             # print(current_ip,data)
+        #             ssh = createSSHClient( current_ip,'22', data[0], data[1])
+        #             scp = SCPClient(ssh.get_transport())
+        #             scp.put('./temp/'+file, remote_path = data[2], recursive=True)
+        #             scp.close()
 
 # thread function
 def threaded(c,ip):
@@ -87,7 +80,10 @@ def threaded(c,ip):
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
                 os.remove('./temp/' + i)
-
+        elif msg[0] == 'add':
+            del msg[-1]
+            for i in msg[1:]:
+                obj.dir_list.append(i)
         # data received from client
         if not data:
             print('Bye')
@@ -109,7 +105,6 @@ def Main():
     start_new_thread(dir_scanner, ())
     # a forever loop until client wants to exit
     while True:
-
         # establish connection with client
         c, addr = s.accept()
         data = c.recv(2048).decode('utf-8')

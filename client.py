@@ -11,7 +11,6 @@ ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 dir_list = []
 deleted_files = []
 ip_add = '10.2.129.127'
-# port ='22'
 
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -30,27 +29,36 @@ def delete_file(deleted_files, s):
         for file in deleted_files:
             del_msg += str(file) + ' '
         s.sendall(bytes(del_msg, 'UTF-8'))
-    # port = 8084
-    # s1 = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    # # connect to server on local computer
-    # s1.connect((ip_add,port))
-    # s1.sendall(bytes(del_msg,'UTF-8'))
-    # s1.close()
     
+def add_file(new_files, s):
+    if(len(new_files) > 0):
+        add_msg = 'add '
+
+        for file in new_files:
+            dir_list.append(file)
+
+        for file in new_files:
+            add_msg += str(file) + ' '
+            ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
+            scp = SCPClient(ssh.get_transport())
+            scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp'+file, recursive=False)
+            scp.close()
+        s.sendall(bytes(add_msg, 'UTF-8'))
 
 def dir_scanner(s):
     temp = os.listdir('./temp')
     new_files = [file for file in temp if file not in dir_list]
     deleted_files = [file for file in dir_list if file not in temp]
-    for i in new_files:
-        dir_list.append(i)
-    if len(new_files)!=0:
-        print(new_files)
-        for file in new_files:
-            ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
-            scp = SCPClient(ssh.get_transport())
-            scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
-            scp.close()
+    # for i in new_files:
+    #     dir_list.append(i)
+    # if len(new_files)!=0:
+    #     print(new_files)
+    #     for file in new_files:
+    #         ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
+    #         scp = SCPClient(ssh.get_transport())
+    #         scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
+    #         scp.close()
+    add_file(new_files,s)
     delete_file(deleted_files, s)
 
 def detect_deleted_file_from_master():
@@ -58,16 +66,30 @@ def detect_deleted_file_from_master():
     # print(ip)
     msg = (master.check_deleted_file())
     if msg:
+
         print(msg)
-        
         file_list = msg.split(' ')
         for file in file_list:
             file_path = './temp/' + file
             if file in list(dir_list):
                 os.remove(file_path)
                 dir_list.remove(file)
+    
+    master._pyroRelease()
 
-        
+def detect_new_files_from_master():
+    master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
+    msg = (master.check_added_file())
+    if msg:
+        file_list = msg.split(' ')
+        for file in file_list:
+            if file not in dir_list:
+                ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
+                scp = SCPClient(ssh.get_transport())
+                scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                scp.close()
+
+    master._pyroRelease()
     
     
 
