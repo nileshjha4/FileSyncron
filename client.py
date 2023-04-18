@@ -55,6 +55,7 @@ def detect_deleted_file_from_master():
     msg = (master.check_deleted_file())
     if msg:
         print(msg)
+        os.remove(os.getcwd() + '/temp/' + msg)
     # file_list = msg.split(' ')[1:]
     # for file in file_list:
     #     file_path = './temp/' + file
@@ -66,12 +67,12 @@ def detect_deleted_file_from_master():
     
 
 # def Main1():
-port = 8083
+port = 8084
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
 s.connect((ip_add,port))
-s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
+s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
 
 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
 scp = SCPClient(ssh.get_transport())
