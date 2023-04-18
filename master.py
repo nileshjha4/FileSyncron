@@ -61,6 +61,7 @@ class Master(object):
     def add_modified_file(self, modified_file_list):
         ip = Pyro5.api.current_context.client_sock_addr[0]
         for file in modified_file_list:
+            print("request for modification: ", file, "by", ip)
             # self.modified_files.append(file)
             self.modified_files[file] = [ip]
         return 'Got_modified'
