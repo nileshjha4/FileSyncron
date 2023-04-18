@@ -40,9 +40,13 @@ class Master(object):
                 temp.append(k)
                 self.del_files[k].append(ip)
             # del_file[k]+=1
-            print(self.del_files[k])
-            if len(self.del_files[k]) == len(ip_list):
-                self.del_files.pop(k)
+
+                if len(self.del_files[k]) == len(ip_list):
+                    print(self.del_files[k])
+                    print("==========", k)
+                    # self.del_files.pop(k)
+                    del self.del_files[k]
+                    print("------------", len(self.del_files))
 
         return ' '.join(temp)
     
@@ -75,9 +79,14 @@ def threaded(c,ip):
     while True:
         data = c.recv(8192).decode('utf-8')
         msg = data.split(' ')
+        print(msg)
+        # msg.pop
         if msg[0] == 'delete':
+            del msg[-1]
             for i in msg[1:]:
                 obj.del_files[i]= [ip]
+                print('./temp/'+i)
+                os.remove('./temp/' + i)
 
         # data received from client
         if not data:
@@ -89,7 +98,7 @@ def threaded(c,ip):
 
 
 def Main():
-    port = 8083
+    port = 8084
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
