@@ -79,8 +79,6 @@ def detect_deleted_file_from_master():
 
 
 def detect_new_files_from_master():
-    # import pdb
-    # pdb.set_trace()
     msg = (master.check_added_file())
     # if msg != ' '.join(dir_list):
     #     print(msg)
@@ -99,12 +97,12 @@ def detect_new_files_from_master():
 # def Main1():
 master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
 
-port = 8084
+port = 8085
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
 s.connect((ip_add,port))
-s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
+s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
 
 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
 scp = SCPClient(ssh.get_transport())
