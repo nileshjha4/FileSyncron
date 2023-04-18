@@ -2,7 +2,7 @@
 import socket, time
 import pdb,os
 import paramiko
-import Pyro4
+import Pyro5.api
 from paramiko import SSHClient
 from scp import SCPClient
 
@@ -51,7 +51,7 @@ def dir_scanner(s):
     delete_file(deleted_files, s)
 
 def detect_deleted_file_from_master():
-    master = Pyro4.core.Proxy('PYRO:Master@' + ip_add + ':9095')
+    master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
     msg = (master.check_deleted_file(ip))
     if msg:
         print(msg)
@@ -66,7 +66,7 @@ def detect_deleted_file_from_master():
     
 
 # def Main1():
-port = 8083
+port = 8084
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer

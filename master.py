@@ -1,7 +1,7 @@
 # import socket programming library
 import socket
 import os
-import Pyro4
+import Pyro5.api
 import paramiko
 from paramiko import SSHClient
 from scp import SCPClient
@@ -12,8 +12,13 @@ import threading
 ip_list = dict()
 dir_list = []
 del_file = {}
-@Pyro4.expose
+
+@Pyro5.api.expose
 class Master(object):
+    # @classmethod
+    def __init__(self):
+        self.del_files = dict()
+
     def check_deleted_file(self, ip):
         # port = 8084
         # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -29,13 +34,13 @@ class Master(object):
         # #         print(f"File {file_path} does not exist.")
         # s.close()
         temp = []
-        for k,v in del_file.items():
-            temp.append(k)
-            if ip not in del_file[k]:
-                del_file[k].append(ip)
+        for k in list(self.del_files.keys()):
+            if ip not in self.del_files[k]:
+                temp.append(k)
+                self.del_files[k].append(ip)
             # del_file[k]+=1
-            if len(del_file[k]) == len(ip_list)-1:
-                del_file.pop(k)
+            if len(self.del_files[k]) == len(ip_list):
+                self.del_files.pop(k)
 
         return ' '.join(temp)
         # return del_file.join(' ')
@@ -71,32 +76,19 @@ def threaded(c,ip):
         msg = data.split(' ')
         if msg[0] == 'delete':
             for i in msg[1:]:
-                del_file[i]= []
+                obj.del_file[i]= [ip]
 
         # data received from client
         if not data:
             print('Bye')
-            # lock released on exit            # print_lock.release()
             break
-
-        # reverse the given string from client
-        # data = data[::-1]
-
-        # # send back reversed string to client
-        # c.send(data.encode('utf-8'))
-
     # connection closed
     ip_list.pop(ip)
     c.close()
 
 
 def Main():
-    host = ""
-
-    # reserve a port on your computer
-    # in our case it is 12345 but it
-    # can be anything
-    port = 8083
+    port = 8084
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
@@ -122,13 +114,15 @@ def Main():
         print(ip_list)
     s.close()
 
-def pyro():
-    Pyro4.Daemon.serveSimple({
-    Master: 'Master',
-    }, host="0.0.0.0", port=9095, ns=False, verbose=True)
+def pyro_func(obj):
+    daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9002)
+    uri = daemon.register(obj,"file_syncron")
+    print("URI:",uri)
+    Pyro5.api.serve({}, host="0.0.0.0", port=9002, daemon=daemon, use_ns=False, verbose=True)
 
 if __name__ == '__main__':
-    start_new_thread(pyro, ())
+    obj = Master()
+    start_new_thread(pyro_func, (obj,))
     Main()
     
 
