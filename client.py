@@ -41,7 +41,7 @@ def add_file(new_files, s):
             add_msg += str(file) + ' '
             ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
             scp = SCPClient(ssh.get_transport())
-            scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp'+file, recursive=False)
+            scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
             scp.close()
         s.sendall(bytes(add_msg, 'UTF-8'))
 
