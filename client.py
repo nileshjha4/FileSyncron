@@ -38,7 +38,7 @@ def add_file(new_files, s):
 
         for file in new_files:
             dir_list.append(file)
-            current_hashes[file] = hashed.get_hash(file)
+            current_hashes[file] = hashed.get_hash('./temp/'+file)
             # if file in gl_del:
             #     gl_del.remove(file)
 
@@ -53,7 +53,7 @@ def add_file(new_files, s):
 def send_modified_files(modified_file, s):
     if(len(modified_file) > 0):
         # add_msg = 'modified '
-        msg = (master.add_modified_files(modified_file))
+        msg = (master.add_modified_file(modified_file))
         
         for file in modified_file:
             # add_msg += str(file) + ' '
@@ -70,9 +70,9 @@ def dir_scanner(s):
 
     for file in temp:
         hash_of_file = hashed.get_hash('./temp/'+file)
-        if(hash_of_file!=current_hashes[file]):
+        if(file in dir_list and hash_of_file!=current_hashes[file]):
             modified_files.append(file)
-            current_hashes[file] = hash_of_file 
+        current_hashes[file] = hash_of_file 
     # for i in new_files:
     #     dir_list.append(i)
     # if len(new_files)!=0:
@@ -132,7 +132,7 @@ def detect_modified_files_from_master():
 # def Main1():
 master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
 
-port = 8084
+port = 8085
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer

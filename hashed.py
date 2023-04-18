@@ -7,7 +7,7 @@ def get_hash(file_name):
 
     md5 = hashlib.md5()
     sha1 = hashlib.sha1()
-
+    # print(file_name)
     with open(file_name, 'rb') as f:
         while True:
             data = f.read(BUF_SIZE)
