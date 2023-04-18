@@ -86,6 +86,7 @@ def threaded(c,ip):
             for i in msg[1:]:
                 if i not in obj.dir_list:
                     obj.dir_list.append(i)
+            print(obj.dir_list)
         # data received from client
         if not data:
             print('Bye')
@@ -96,7 +97,7 @@ def threaded(c,ip):
 
 
 def Main():
-    port = 8083
+    port = 8084
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
