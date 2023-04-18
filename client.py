@@ -76,6 +76,8 @@ def detect_deleted_file_from_master():
 
 
 def detect_new_files_from_master():
+    # import pdb
+    # pdb.set_trace()
     msg = (master.check_added_file())
     # if msg != ' '.join(dir_list):
     #     print(msg)

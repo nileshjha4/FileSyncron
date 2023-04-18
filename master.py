@@ -21,7 +21,7 @@ class Master(object):
         self.dir_list = []
 
     def check_deleted_file(self):
-
+        
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
@@ -56,16 +56,6 @@ def dir_scanner():
         new_files = [file for file in temp if file not in obj.dir_list]
         for i in new_files:
             obj.dir_list.append(i)
-        # if len(new_files)!=0:
-        #     print(new_files)
-        #     for file in new_files:
-        #         # print(file)
-        #         for current_ip,data in ip_list.items():
-        #             # print(current_ip,data)
-        #             ssh = createSSHClient( current_ip,'22', data[0], data[1])
-        #             scp = SCPClient(ssh.get_transport())
-        #             scp.put('./temp/'+file, remote_path = data[2], recursive=True)
-        #             scp.close()
 
 # thread function
 def threaded(c,ip):
@@ -78,6 +68,7 @@ def threaded(c,ip):
             del msg[-1]
             for i in msg[1:]:
                 obj.dir_list.remove(i)
+                print(i,obj.dir_list)
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
                 os.remove('./temp/' + i)
