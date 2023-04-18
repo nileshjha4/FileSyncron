@@ -23,6 +23,10 @@ def createSSHClient(server, port, user, password):
 def delete_file(deleted_files, s):
     if(len(deleted_files) > 0):
         del_msg = 'delete '
+
+        for file in deleted_files:
+            dir_list.remove(file)
+
         for file in deleted_files:
             del_msg += str(file) + ' '
         s.sendall(bytes(del_msg, 'UTF-8'))
@@ -73,7 +77,7 @@ port = 8084
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
 s.connect((ip_add,port))
-s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
+s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
 
 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
 scp = SCPClient(ssh.get_transport())
