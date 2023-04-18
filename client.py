@@ -80,6 +80,8 @@ def detect_deleted_file_from_master():
 def detect_new_files_from_master():
     master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
     msg = (master.check_added_file())
+    if msg != ' '.join(dir_list):
+        print(msg)
     if msg:
         file_list = msg.split(' ')
         for file in file_list:
@@ -88,13 +90,12 @@ def detect_new_files_from_master():
                 scp = SCPClient(ssh.get_transport())
                 scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
                 scp.close()
-
     master._pyroRelease()
     
     
 
 # def Main1():
-port = 8084
+port = 8083
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
