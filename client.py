@@ -55,14 +55,15 @@ def detect_deleted_file_from_master():
     msg = (master.check_deleted_file())
     if msg:
         print(msg)
-        os.remove(os.getcwd() + '/temp/' + msg)
-    # file_list = msg.split(' ')[1:]
-    # for file in file_list:
-    #     file_path = './temp/' + file
-    #     try:
-    #         os.remove(file_path)
-    #     except FileNotFoundError:
-    #         print(f"File {file_path} does not exist.")
+        
+        file_list = msg.split(' ')[1:]
+        for file in file_list:
+            file_path = './temp/' + file
+            if file in list(dir_list):
+                os.remove(file_path)
+                dir_list.remove(file)
+
+        
     
     
 
