@@ -56,7 +56,7 @@ def detect_deleted_file_from_master():
     if msg:
         print(msg)
         
-        file_list = msg.split(' ')[1:]
+        file_list = msg.split(' ')
         for file in file_list:
             file_path = './temp/' + file
             if file in list(dir_list):
