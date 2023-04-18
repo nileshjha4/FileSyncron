@@ -6,8 +6,7 @@ import Pyro5.api
 from paramiko import SSHClient
 from scp import SCPClient
 
-hostname = socket.gethostname()
-ip = socket.gethostbyname(hostname)
+ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 
 dir_list = []
 deleted_files = []
@@ -52,7 +51,8 @@ def dir_scanner(s):
 
 def detect_deleted_file_from_master():
     master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
-    msg = (master.check_deleted_file(ip))
+    # print(ip)
+    msg = (master.check_deleted_file())
     if msg:
         print(msg)
     # file_list = msg.split(' ')[1:]
@@ -66,12 +66,12 @@ def detect_deleted_file_from_master():
     
 
 # def Main1():
-port = 8084
+port = 8083
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
 s.connect((ip_add,port))
-s.sendall(bytes("purnima Ketan1411 " + os.getcwd() +"/temp",'UTF-8'))
+s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
 
 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
 scp = SCPClient(ssh.get_transport())
