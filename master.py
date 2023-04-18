@@ -62,7 +62,7 @@ class Master(object):
         ip = Pyro5.api.current_context.client_sock_addr[0]
         for file in modified_file_list:
             # self.modified_files.append(file)
-            self.modified_files = [ip]
+            self.modified_files[file] = [ip]
         return 'Got_modified'
 
 
