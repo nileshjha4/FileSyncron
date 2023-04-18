@@ -109,6 +109,7 @@ scp.close()
 while True:
     dir_scanner(s)
     detect_deleted_file_from_master()
+    detect_new_files_from_master()
 s.close()
 
 # Main1()
