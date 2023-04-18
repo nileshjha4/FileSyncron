@@ -19,7 +19,7 @@ class Master(object):
     def __init__(self):
         self.del_files = dict()
 
-    def check_deleted_file(self, ip):
+    def check_deleted_file(self):
         # port = 8084
         # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # s.bind(('0.0.0.0', port))
@@ -33,17 +33,18 @@ class Master(object):
         # #     except FileNotFoundError:
         # #         print(f"File {file_path} does not exist.")
         # s.close()
+        ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
             if ip not in self.del_files[k]:
                 temp.append(k)
                 self.del_files[k].append(ip)
             # del_file[k]+=1
+            print(self.del_files[k])
             if len(self.del_files[k]) == len(ip_list):
                 self.del_files.pop(k)
 
         return ' '.join(temp)
-        # return del_file.join(' ')
     
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -76,7 +77,7 @@ def threaded(c,ip):
         msg = data.split(' ')
         if msg[0] == 'delete':
             for i in msg[1:]:
-                obj.del_file[i]= [ip]
+                obj.del_files[i]= [ip]
 
         # data received from client
         if not data:
@@ -88,7 +89,7 @@ def threaded(c,ip):
 
 
 def Main():
-    port = 8084
+    port = 8083
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
