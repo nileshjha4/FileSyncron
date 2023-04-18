@@ -11,7 +11,7 @@ ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 current_hashes={}
 dir_list = []
 ip_add = '10.2.129.127'
-modified_files = []
+# modified_files = []
 
 def createSSHClient(server, port, user, password):
     client = paramiko.SSHClient()
@@ -50,28 +50,32 @@ def add_file(new_files, s):
             scp.close()
         s.sendall(bytes(add_msg, 'UTF-8'))
 
-def send_modified_files(modified_file, s):
-    if(len(modified_file) > 0):
+def send_modified_files(modified_files, s):
+    if(len(modified_files) > 0):
         # add_msg = 'modified '
-        msg = (master.add_modified_file(modified_file))
+        print(modified_files)
+        msg = (master.add_modified_file(modified_files))
         
-        for file in modified_file:
+        for file in modified_files:
             # add_msg += str(file) + ' '
             ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
             scp = SCPClient(ssh.get_transport())
             scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
             scp.close()
+        
+        modified_files.clear()
         # s.sendall(bytes(add_msg, 'UTF-8'))
 
 def dir_scanner(s):
     temp = os.listdir('./temp')
     new_files = [file for file in temp if file not in dir_list]
     deleted_files = [file for file in dir_list if file not in temp]
-
+    modified_files = []
     for file in temp:
         hash_of_file = hashed.get_hash('./temp/'+file)
         if(file in dir_list and hash_of_file!=current_hashes[file]):
             modified_files.append(file)
+            print(file,hash_of_file,current_hashes[file])
         current_hashes[file] = hash_of_file 
     # for i in new_files:
     #     dir_list.append(i)
@@ -119,7 +123,9 @@ def detect_new_files_from_master():
 
 def detect_modified_files_from_master():   
     msg = (master.check_modified_file())     
+    # print("msg",msg)
     if msg:
+        # print(msg)
         file_list = msg.split(' ')
         for file in file_list:
             if file in dir_list:
@@ -148,6 +154,7 @@ while True:
     dir_scanner(s)
     detect_deleted_file_from_master()    
     detect_new_files_from_master()
+    detect_modified_files_from_master()
 s.close()
 
 # Main1()

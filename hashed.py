@@ -17,6 +17,6 @@ def get_hash(file_name):
             sha1.update(data)
 
     # print(sha1.hexdigest)
-    return sha1.hexdigest
+    return sha1.hexdigest()
 
 
