@@ -9,7 +9,7 @@ from scp import SCPClient
 ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 
 dir_list = []
-deleted_files = []
+gl_del = []
 ip_add = '10.2.129.127'
 
 def createSSHClient(server, port, user, password):
@@ -25,6 +25,7 @@ def delete_file(deleted_files, s):
 
         for file in deleted_files:
             dir_list.remove(file)
+            gl_del.append(file)
 
         for file in deleted_files:
             del_msg += str(file) + ' '
@@ -36,6 +37,8 @@ def add_file(new_files, s):
 
         for file in new_files:
             dir_list.append(file)
+            if file in gl_del:
+                gl_del.remo(file)
 
         for file in new_files:
             add_msg += str(file) + ' '
@@ -84,7 +87,7 @@ def detect_new_files_from_master():
     if msg:
         file_list = msg.split(' ')
         for file in file_list:
-            if file not in dir_list:
+            if file not in dir_list and file not in gl_del:
                 print(file)
                 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
                 scp = SCPClient(ssh.get_transport())

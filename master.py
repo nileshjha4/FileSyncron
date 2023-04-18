@@ -19,9 +19,10 @@ class Master(object):
     def __init__(self):
         self.del_files = dict()
         self.dir_list = []
+        # self.dir_list = []
 
     def check_deleted_file(self):
-        
+
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
@@ -35,6 +36,7 @@ class Master(object):
                     # print("==========", k)
                     # self.del_files.pop(k)
                     del self.del_files[k]
+                    obj.dir_list.remove(k)
                     # print("------------", len(self.del_files))
                     print('--> Deleted',k)
 
@@ -67,7 +69,6 @@ def threaded(c,ip):
         if msg[0] == 'delete':
             del msg[-1]
             for i in msg[1:]:
-                obj.dir_list.remove(i)
                 print(i,obj.dir_list)
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
@@ -88,7 +89,7 @@ def threaded(c,ip):
 
 
 def Main():
-    port = 8084
+    port = 8085
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
