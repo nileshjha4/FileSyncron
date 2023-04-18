@@ -19,6 +19,7 @@ class Master(object):
     def __init__(self):
         self.del_files = dict()
         self.dir_list = []
+        self.modified_files=dict()
         # self.dir_list = []
 
     def check_deleted_file(self):
@@ -41,6 +42,31 @@ class Master(object):
                     print('--> Deleted',k)
 
         return ' '.join(temp)
+    
+    def check_modified_file(self):
+        ip = Pyro5.api.current_context.client_sock_addr[0]
+        temp = []
+        for k in list(self.modified_files.keys()):
+            if ip not in self.modified_files[k]:
+                temp.append(k)
+                self.modified_files[k].append(ip)
+            # del_file[k]+=1
+
+                if len(self.modified_files[k]) == len(ip_list):
+                    print("Files Modified : " , self.modified_files[k])
+                    del self.modified_files[k]
+
+        return ' '.join(temp)
+
+    def add_modified_file(self, modified_file_list):
+        ip = Pyro5.api.current_context.client_sock_addr[0]
+        for file in modified_file_list:
+            # self.modified_files.append(file)
+            self.modified_files = [ip]
+        return 'Got_modified'
+
+
+
     
     def check_added_file(self):
         return ' '.join(self.dir_list)
