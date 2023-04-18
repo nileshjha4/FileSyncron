@@ -5,11 +5,11 @@ import paramiko
 import Pyro5.api
 from paramiko import SSHClient
 from scp import SCPClient
+import time
 
 ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 
 dir_list = []
-gl_del = []
 ip_add = '10.2.129.127'
 
 def createSSHClient(server, port, user, password):
@@ -25,11 +25,11 @@ def delete_file(deleted_files, s):
 
         for file in deleted_files:
             dir_list.remove(file)
-            gl_del.append(file)
 
         for file in deleted_files:
             del_msg += str(file) + ' '
         s.sendall(bytes(del_msg, 'UTF-8'))
+        # time.sleep(4)
     
 def add_file(new_files, s):
     if(len(new_files) > 0):
@@ -37,8 +37,8 @@ def add_file(new_files, s):
 
         for file in new_files:
             dir_list.append(file)
-            if file in gl_del:
-                gl_del.remo(file)
+            # if file in gl_del:
+            #     gl_del.remove(file)
 
         for file in new_files:
             add_msg += str(file) + ' '
@@ -68,7 +68,6 @@ def detect_deleted_file_from_master():
     # print(ip)
     msg = (master.check_deleted_file())
     if msg:
-
         print(msg)
         file_list = msg.split(' ')
         for file in file_list:
@@ -76,16 +75,19 @@ def detect_deleted_file_from_master():
             if file in list(dir_list):
                 os.remove(file_path)
                 dir_list.remove(file)
+        # time.sleep(4)
 
 
 def detect_new_files_from_master():
+    # pdb.set_trace()
+
     msg = (master.check_added_file())
     # if msg != ' '.join(dir_list):
     #     print(msg)
     if msg:
         file_list = msg.split(' ')
         for file in file_list:
-            if file not in dir_list and file not in gl_del:
+            if file not in dir_list:
                 print(file)
                 ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
                 scp = SCPClient(ssh.get_transport())
@@ -97,7 +99,7 @@ def detect_new_files_from_master():
 # def Main1():
 master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
 
-port = 8085
+port = 8084
 # pdb.set_trace()
 s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 # connect to server on local computer
@@ -111,7 +113,7 @@ scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/File
 scp.close()  
 while True:
     dir_scanner(s)
-    detect_deleted_file_from_master()
+    detect_deleted_file_from_master()    
     detect_new_files_from_master()
 s.close()
 
