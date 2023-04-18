@@ -77,13 +77,15 @@ def threaded(c,ip):
         if msg[0] == 'delete':
             del msg[-1]
             for i in msg[1:]:
+                obj.dir_list.remove(i)
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
                 os.remove('./temp/' + i)
         elif msg[0] == 'add':
             del msg[-1]
             for i in msg[1:]:
-                obj.dir_list.append(i)
+                if i not in obj.dir_list:
+                    obj.dir_list.append(i)
         # data received from client
         if not data:
             print('Bye')
@@ -94,7 +96,7 @@ def threaded(c,ip):
 
 
 def Main():
-    port = 8084
+    port = 8083
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
