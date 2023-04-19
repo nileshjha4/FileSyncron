@@ -98,7 +98,7 @@ def threaded(c,ip):
             del msg[-1]
             for i in msg[1:]:
                 print(i,obj.dir_list)
-                log_msg = 'delete ' + i + ' ' + ip
+                log_msg = 'delete ' + i + ' ' + ip + '\n'
                 log_file.write(log_msg)
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
@@ -108,7 +108,7 @@ def threaded(c,ip):
             del msg[-1]
             for i in msg[1:]:
                 if i not in obj.dir_list:
-                    log_msg = 'add ' + i + ' ' + ip
+                    log_msg = 'add ' + i + ' ' + ip + '\n'
                     log_file.write(log_msg)
                     obj.dir_list.append(i)
             print(obj.dir_list)

@@ -85,11 +85,11 @@ def dir_scanner(s):
     #         ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
     #         scp = SCPClient(ssh.get_transport())
     #         scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
+    delete_file(deleted_files, s)
+    detect_deleted_file_from_master()    
     #         scp.close()
     add_file(new_files,s)
     detect_new_files_from_master()
-    delete_file(deleted_files, s)
-    detect_deleted_file_from_master()    
     send_modified_files(modified_files,s)
     detect_modified_files_from_master()
 
