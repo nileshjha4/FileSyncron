@@ -10,6 +10,7 @@ from _thread import *
 import threading
 # print_lock = threading.Lock()
 ip_list = dict()
+ip_list_old = []
 # dir_list = []
 # del_file = {}
 
@@ -61,6 +62,9 @@ class Master(object):
     def add_modified_file(self, modified_file_list):
         ip = Pyro5.api.current_context.client_sock_addr[0]
         for file in modified_file_list:
+            log_file = open('log','a')
+            log_file.write("Modified " + str(file) + " " + str(ip) + "\n")
+            log_file.close()
             print("request for modification: ", file, "by", ip)
             # self.modified_files.append(file)
             self.modified_files[file] = [ip]
@@ -88,7 +92,6 @@ def dir_scanner():
 
 # thread function
 def threaded(c,ip):
-    log_file = open('log','a')
     while True:
         data = c.recv(8192).decode('utf-8')
         msg = data.split(' ')
@@ -99,7 +102,9 @@ def threaded(c,ip):
             for i in msg[1:]:
                 print(i,obj.dir_list)
                 log_msg = 'delete ' + i + ' ' + ip + '\n'
+                log_file = open('log','a')
                 log_file.write(log_msg)
+                log_file.close()
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
                 obj.dir_list.remove(i)
@@ -109,7 +114,9 @@ def threaded(c,ip):
             for i in msg[1:]:
                 if i not in obj.dir_list:
                     log_msg = 'add ' + i + ' ' + ip + '\n'
+                    log_file = open('log','a')
                     log_file.write(log_msg)
+                    log_file.close()
                     obj.dir_list.append(i)
             print(obj.dir_list)
         # data received from client
@@ -118,6 +125,8 @@ def threaded(c,ip):
             break
     # connection closed
     ip_list.pop(ip)
+    log_file = open('log','a')
+    log_file.write("Disconnected " + str(ip) + "\n")
     log_file.close()
     c.close()
 
@@ -126,7 +135,7 @@ def Main():
     # if('log' in os.listdir('./temp')){
     #     os.remove('./temp/log')
     # }
-    port = 8085
+    port = 12345
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
     print("socket binded to port", port)
@@ -145,7 +154,10 @@ def Main():
         # lock acquired by client
         # print_lock.acquire()
         print('Connected to :', addr[0], ':', addr[1])
-        addr
+        log_file = open('log', 'a')
+        log_file.write("Connected " + str(addr[0])+"\n")
+        log_file.close()
+        # addr
         ip_list[addr[0]] = data1
         # Start a new thread and return its identifier
         start_new_thread(threaded, (c,addr[0]))

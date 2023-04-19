@@ -8,7 +8,7 @@ _pycache_/
 
 temp/
 ssh/
-
+log
 # Distribution / packaging
 .Python
 build/

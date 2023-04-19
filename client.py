@@ -147,23 +147,32 @@ def detect_modified_files_from_master():
                 scp.close()
                 current_hashes[file] = hashed.get_hash('./temp/'+file)
 
-# def Main1():
-master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9001')
+def Main1():
+    global master
+    master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9001')
 
-port = 8085
-# pdb.set_trace()
-s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-# connect to server on local computer
-s.connect((ip_add,port))
-s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
+    port = 8085
+    # pdb.set_trace()
+    global s 
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    # connect to server on local computer
+    s.connect((ip_add,port))
+    s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
 
-ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
-scp = SCPClient(ssh.get_transport())
-scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
-scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
-scp.close()  
-while True:
-    dir_scanner(s)
-s.close()
+    ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
+    scp = SCPClient(ssh.get_transport())
+    scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
+    scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
+    scp.close()  
+    while True:
+        dir_scanner(s)
+    s.close()
 
-# Main1()
+connected = False
+while not connected:
+    try:
+        Main1()
+        connected = True
+    except:
+        connected = False
+        time.sleep(2)
