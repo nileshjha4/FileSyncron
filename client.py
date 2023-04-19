@@ -92,6 +92,9 @@ def dir_scanner(s):
     detect_new_files_from_master()
     send_modified_files(modified_files,s)
     detect_modified_files_from_master()
+    # detect_modified_files_from_master()
+    # detect_modified_files_from_master()
+    # detect_modified_files_from_master()
 
     
 
@@ -138,11 +141,14 @@ def detect_modified_files_from_master():
                 scp = SCPClient(ssh.get_transport())
                 os.remove('./temp/'+file)
                 scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                
                 scp.close()
                 current_hashes[file] = hashed.get_hash('./temp/'+file)
 
 # def Main1():
-master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9002')
+master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9001')
 
 port = 8085
 # pdb.set_trace()
