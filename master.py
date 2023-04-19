@@ -36,8 +36,8 @@ class Master(object):
                     print(self.del_files[k])
                     # print("==========", k)
                     # self.del_files.pop(k)
+                    os.remove('./temp/' + k)
                     del self.del_files[k]
-                    obj.dir_list.remove(k)
                     # print("------------", len(self.del_files))
                     print('--> Deleted',k)
 
@@ -80,11 +80,11 @@ def createSSHClient(server, port, user, password):
     return client
 
 def dir_scanner():
-    while True:
-        temp = os.listdir('./temp')
-        new_files = [file for file in temp if file not in obj.dir_list]
-        for i in new_files:
-            obj.dir_list.append(i)
+    # while True:
+    temp = os.listdir('./temp')
+    new_files = [file for file in temp if file not in obj.dir_list]
+    for i in new_files:
+        obj.dir_list.append(i)
 
 # thread function
 def threaded(c,ip):
@@ -102,7 +102,7 @@ def threaded(c,ip):
                 log_file.write(log_msg)
                 obj.del_files[i]= [ip]
                 print('./temp/'+i)
-                os.remove('./temp/' + i)
+                obj.dir_list.remove(i)
 
         elif msg[0] == 'add':
             del msg[-1]
@@ -134,7 +134,8 @@ def Main():
     # put the socket into listening mode
     s.listen(5)
     print("socket is listening")
-    start_new_thread(dir_scanner, ())
+    # start_new_thread(dir_scanner, ())
+    dir_scanner()
     # a forever loop until client wants to exit
     while True:
         # establish connection with client
@@ -152,7 +153,7 @@ def Main():
     s.close()
 
 def pyro_func(obj):
-    daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9002)
+    daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9001)
     uri = daemon.register(obj,"file_syncron")
     print("URI:",uri)
     Pyro5.api.serve({}, host="0.0.0.0", port=9002, daemon=daemon, use_ns=False, verbose=True)
