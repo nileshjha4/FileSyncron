@@ -5,14 +5,10 @@ import Pyro5.api
 import paramiko
 from paramiko import SSHClient
 from scp import SCPClient
-# import thread module
 from _thread import *
 import threading
-# print_lock = threading.Lock()
 ip_list = dict()
 ip_list_old = []
-# dir_list = []
-# del_file = {}
 
 @Pyro5.api.expose
 class Master(object):
@@ -34,13 +30,13 @@ class Master(object):
             # del_file[k]+=1
 
                 if len(self.del_files[k]) == len(ip_list):
-                    print(self.del_files[k])
+                    # print(self.del_files[k])
                     # print("==========", k)
                     # self.del_files.pop(k)
                     os.remove('./temp/' + k)
                     del self.del_files[k]
                     # print("------------", len(self.del_files))
-                    print('--> Deleted',k)
+                    print('--> Deleted File', k)
 
         return ' '.join(temp)
     
@@ -54,7 +50,7 @@ class Master(object):
             # del_file[k]+=1
 
                 if len(self.modified_files[k]) == len(ip_list):
-                    print("Files Modified : " , self.modified_files[k])
+                    print("-->Files Modified : " , k)
                     del self.modified_files[k]
 
         return ' '.join(temp)
@@ -65,7 +61,7 @@ class Master(object):
             log_file = open('log','a')
             log_file.write("Modified " + str(file) + " " + str(ip) + "\n")
             log_file.close()
-            print("request for modification: ", file, "by", ip)
+            print("--> Request for modification:", file, "by", ip)
             # self.modified_files.append(file)
             self.modified_files[file] = [ip]
         return 'Got_modified'
@@ -135,16 +131,15 @@ def Main():
     # if('log' in os.listdir('./temp')){
     #     os.remove('./temp/log')
     # }
-    port = 12345
+    port = 54321
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
-    print("socket binded to port", port)
-
-    # put the socket into listening mode
+    # print("socket binded to port", port)
     s.listen(5)
-    print("socket is listening")
-    # start_new_thread(dir_scanner, ())
+    print("Master is listening at port:", port)
+
     dir_scanner()
+
     # a forever loop until client wants to exit
     while True:
         # establish connection with client
@@ -167,7 +162,7 @@ def Main():
 def pyro_func(obj):
     daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9001)
     uri = daemon.register(obj,"file_syncron")
-    print("URI:",uri)
+    # print("URI:",uri)
     Pyro5.api.serve({}, host="0.0.0.0", port=9002, daemon=daemon, use_ns=False, verbose=True)
 
 if __name__ == '__main__':
