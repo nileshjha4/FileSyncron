@@ -17,25 +17,18 @@ class Master(object):
         self.del_files = dict()
         self.dir_list = []
         self.modified_files=dict()
-        # self.dir_list = []
 
     def check_deleted_file(self):
-
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
             if ip not in self.del_files[k]:
                 temp.append(k)
                 self.del_files[k].append(ip)
-            # del_file[k]+=1
 
                 if len(self.del_files[k]) == len(ip_list):
-                    # print(self.del_files[k])
-                    # print("==========", k)
-                    # self.del_files.pop(k)
                     os.remove('./temp/' + k)
                     del self.del_files[k]
-                    # print("------------", len(self.del_files))
                     print('--> Deleted File', k)
 
         return ' '.join(temp)
@@ -47,8 +40,6 @@ class Master(object):
             if ip not in self.modified_files[k]:
                 temp.append(k)
                 self.modified_files[k].append(ip)
-            # del_file[k]+=1
-
                 if len(self.modified_files[k]) == len(ip_list):
                     print("-->Files Modified : " , k)
                     del self.modified_files[k]
@@ -62,12 +53,8 @@ class Master(object):
             log_file.write("Modified " + str(file) + " " + str(ip) + "\n")
             log_file.close()
             print("--> Request for modification:", file, "by", ip)
-            # self.modified_files.append(file)
             self.modified_files[file] = [ip]
         return 'Got_modified'
-
-
-
     
     def check_added_file(self):
         return ' '.join(self.dir_list)
@@ -86,13 +73,11 @@ def dir_scanner():
     for i in new_files:
         obj.dir_list.append(i)
 
-# thread function
 def threaded(c,ip):
     while True:
         data = c.recv(8192).decode('utf-8')
         msg = data.split(' ')
         print(msg)
-        # msg.pop
         if msg[0] == 'delete':
             del msg[-1]
             for i in msg[1:]:
@@ -115,46 +100,32 @@ def threaded(c,ip):
                     log_file.close()
                     obj.dir_list.append(i)
             print(obj.dir_list)
-        # data received from client
         if not data:
             print('Bye')
             break
-    # connection closed
     ip_list.pop(ip)
     log_file = open('log','a')
     log_file.write("Disconnected " + str(ip) + "\n")
     log_file.close()
     c.close()
 
-
 def Main():
-    # if('log' in os.listdir('./temp')){
-    #     os.remove('./temp/log')
-    # }
     port = 54321
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind(('0.0.0.0', port))
-    # print("socket binded to port", port)
     s.listen(5)
     print("Master is listening at port:", port)
-
     dir_scanner()
-
-    # a forever loop until client wants to exit
     while True:
-        # establish connection with client
         c, addr = s.accept()
         data = c.recv(2048).decode('utf-8')
         data1 = data.split(' ')
-        # lock acquired by client
-        # print_lock.acquire()
         print('Connected to :', addr[0], ':', addr[1])
         log_file = open('log', 'a')
         log_file.write("Connected " + str(addr[0])+"\n")
         log_file.close()
         # addr
         ip_list[addr[0]] = data1
-        # Start a new thread and return its identifier
         start_new_thread(threaded, (c,addr[0]))
         print(ip_list)
     s.close()
@@ -162,8 +133,8 @@ def Main():
 def pyro_func(obj):
     daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9001)
     uri = daemon.register(obj,"file_syncron")
-    # print("URI:",uri)
-    Pyro5.api.serve({}, host="0.0.0.0", port=9002, daemon=daemon, use_ns=False, verbose=True)
+    # print(uri)
+    Pyro5.api.serve({}, daemon=daemon, use_ns=False, verbose=True)
 
 if __name__ == '__main__':
     obj = Master()

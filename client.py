@@ -7,6 +7,8 @@ from scp import SCPClient
 import time
 import hashed
 
+from config import *
+
 ip = socket.gethostbyname_ex(socket.gethostname())[-1]
 current_hashes={}
 dir_list = []
@@ -39,16 +41,16 @@ def add_file(new_files, s):
         for file in new_files:
             dir_list.append(file)
             # current_hashes[file] = hashed.get_hash('./temp/'+file)
-            current_hashes[file] = hashed.get_hash(dir_path + '/' + file)
+            current_hashes[file] = hashed.get_hash(LOCAL_PATH + '/' + file)
             # if file in gl_del:
             #     gl_del.remove(file)
 
         for file in new_files:
             add_msg += str(file) + ' '
-            ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
+            ssh = createSSHClient(ip_add, '22', USER_NAME, PASSWORD)
             scp = SCPClient(ssh.get_transport())
-            # scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-            scp.put(dir_path + '/' + file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+            # scp.put('./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+            scp.put(LOCAL_PATH + '/' + file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
             scp.close()
         s.sendall(bytes(add_msg, 'UTF-8'))
 
@@ -60,10 +62,10 @@ def send_modified_files(modified_files, s):
         
         for file in modified_files:
             # add_msg += str(file) + ' '
-            ssh = createSSHClient(ip_add, '22', 'nilesh', '041997')
+            ssh = createSSHClient(ip_add, '22', USER_NAME, PASSWORD)
             scp = SCPClient(ssh.get_transport())
-            # scp.put('./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-            scp.put(dir_path + '/' + file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+            # scp.put('./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+            scp.put(LOCAL_PATH + '/' + file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
             scp.close()
         
         modified_files.clear()
@@ -71,13 +73,13 @@ def send_modified_files(modified_files, s):
 
 def dir_scanner(s):
     # temp = os.listdir('./temp')
-    temp = os.listdir(dir_path)
+    temp = os.listdir(LOCAL_PATH)
     new_files = [file for file in temp if file not in dir_list]
     deleted_files = [file for file in dir_list if file not in temp]
     modified_files = []
     for file in temp:
         # hash_of_file = hashed.get_hash('./temp/'+file)
-        hash_of_file = hashed.get_hash(dir_path + '/' + file)
+        hash_of_file = hashed.get_hash(LOCAL_PATH + '/' + file)
         if(file in dir_list and hash_of_file!=current_hashes[file]):
             modified_files.append(file)
             print(file,hash_of_file,current_hashes[file])
@@ -99,7 +101,7 @@ def detect_deleted_file_from_master():
         file_list = msg.split(' ')
         for file in file_list:
             # file_path = './temp/' + file
-            file_path = dir_path + '/' + file
+            file_path = LOCAL_PATH + '/' + file
             if file in list(dir_list):
                 os.remove(file_path)
                 dir_list.remove(file)
@@ -116,10 +118,10 @@ def detect_new_files_from_master():
         for file in file_list:
             if file not in dir_list:
                 print(file)
-                ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
+                ssh = createSSHClient( ip_add, '22', USER_NAME, PASSWORD)
                 scp = SCPClient(ssh.get_transport())
-                scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                scp.get(local_path=dir_path+'/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                # scp.get(LOCAL_PATH='./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                scp.get(LOCAL_PATH=LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
                 scp.close()
 
 def detect_modified_files_from_master():   
@@ -131,20 +133,20 @@ def detect_modified_files_from_master():
         for file in file_list:
             if file in dir_list:
                 print(file)
-                ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
+                ssh = createSSHClient( ip_add, '22', USER_NAME, PASSWORD)
                 scp = SCPClient(ssh.get_transport())
                 # os.remove('./temp/'+file)
-                os.remove(dir_path + '/' + file)
-                # scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                scp.get(local_path=dir_path+'/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                scp.get(local_path=dir_path+'/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                scp.get(local_path=dir_path+'/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                # scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
-                # scp.get(local_path='./temp/'+file, remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp/'+file, recursive=False)
+                os.remove(LOCAL_PATH + '/' + file)
+                # scp.get(LOCAL_PATH='./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                scp.get(LOCAL_PATH=LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                scp.get(LOCAL_PATH=LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                scp.get(LOCAL_PATH=LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                # scp.get(LOCAL_PATH='./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
+                # scp.get(LOCAL_PATH='./temp/'+file, remote_path = REMOTE_PATH + '/' +file, recursive=False)
                 
                 scp.close()
                 # current_hashes[file] = hashed.get_hash('./temp/'+file)
-                current_hashes[file] = hashed.get_hash(dir_path+'/'+file)
+                current_hashes[file] = hashed.get_hash(LOCAL_PATH+'/'+file)
                 
 
 def Main1():
@@ -159,18 +161,19 @@ def Main1():
     s.connect((ip_add,port))
     s.sendall(bytes("vishal Vishal8199 " + os.getcwd() +"/temp",'UTF-8'))
 
-    ssh = createSSHClient( ip_add, '22', 'nilesh', '041997')
+    ssh = createSSHClient( ip_add, '22', USER_NAME, PASSWORD)
     scp = SCPClient(ssh.get_transport())
-    scp.get(local_path='./', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron/temp', recursive=True)
-    scp.put('./temp', remote_path = '/home/nilesh/Documents/Distributed_Systems/FileSyncron', recursive=True)
+    scp.get(LOCAL_PATH='./', remote_path = REMOTE_PATH, recursive=True)
+    scp.put(LOCAL_PATH, remote_path = REMOTE_PATH[:REMOTE_PATH.rfind('/')], recursive=True)
     scp.close()  
     while True:
         dir_scanner(s)
     s.close()
 
 
-dir_path = sys.argv[0]
+# LOCAL_PATH = sys.argv[0]
 ip_add = sys.argv[1]
+port = sys.argv[2]
 
 connected = False
 while not connected:
