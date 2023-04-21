@@ -19,6 +19,7 @@ class Master(object):
         self.modified_files=dict()
 
     def check_deleted_file(self):
+        
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
@@ -30,7 +31,10 @@ class Master(object):
                     os.remove('./volume/' + k)
                     del self.del_files[k]
                     print('--> Deleted File', k)
-
+            elif len(ip_list) == 1:
+                os.remove('./volume/' + k)
+                del self.del_files[k]
+                print('--> Deleted File', k)
         return ' '.join(temp)
     
     def check_modified_file(self):
@@ -43,8 +47,10 @@ class Master(object):
                 if len(self.modified_files[k]) == len(ip_list):
                     print("-->Files Modified : " , k)
                     del self.modified_files[k]
-
-        return ' '.join(temp)
+            elif len(ip_list) == 1:
+                print("-->Files Modified : " , k)
+                del self.modified_files[k]
+        return ' '.join(temp) 
 
     def add_modified_file(self, modified_file_list):
         ip = Pyro5.api.current_context.client_sock_addr[0]
@@ -87,6 +93,7 @@ def threaded(c,ip):
                 log_file.write(log_msg)
                 log_file.close()
                 obj.del_files[i]= [ip]
+                print(obj.del_files)
                 print('./volume/'+i)
                 obj.dir_list.remove(i)
 
@@ -144,6 +151,3 @@ port = int(sys.argv[1])
 start_new_thread(pyro_func, (obj,))
 Main()
     
-
-
-
