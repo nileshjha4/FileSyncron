@@ -1,4 +1,3 @@
-# import socket programming library
 import socket
 import os,sys
 import Pyro5.api
@@ -19,7 +18,11 @@ class Master(object):
         self.modified_files=dict()
 
     def check_deleted_file(self):
-        
+        """
+        Description: This function checks if any file is deleted from it's directory then send list of that files to client in form of string.
+        Input: No input is taken
+        Output: String of deleted file names     
+        """
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.del_files.keys()):
@@ -38,6 +41,11 @@ class Master(object):
         return ' '.join(temp)
     
     def check_modified_file(self):
+        """
+        Description: This function checks if any file is modified from it's directory then send list of that files to client in form of string.
+        Input: No input is taken
+        Output: String of modified file names     
+        """
         ip = Pyro5.api.current_context.client_sock_addr[0]
         temp = []
         for k in list(self.modified_files.keys()):
@@ -53,6 +61,11 @@ class Master(object):
         return ' '.join(temp) 
 
     def add_modified_file(self, modified_file_list):
+        """
+        Description: This function checks if any file is modified from it's directory then send list of that files to client in form of string.
+        Input: Modified file list
+        Output: Got Modified message   
+        """
         ip = Pyro5.api.current_context.client_sock_addr[0]
         for file in modified_file_list:
             log_file = open('log','a')
@@ -63,9 +76,19 @@ class Master(object):
         return 'Got_modified'
     
     def check_added_file(self):
+        """
+        Description: This function checks if any file is added from it's directory then send list of that files to client in form of string.
+        Input: No input is taken
+        Output: String of added file names     
+        """
         return ' '.join(self.dir_list)
     
 def createSSHClient(server, port, user, password):
+    """
+        Description: This function returns the client object connected to the server
+        Input: IP address of host, port of host, host username, host password
+        Output: Object of client connected to the server        
+    """
     client = paramiko.SSHClient()
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -73,6 +96,9 @@ def createSSHClient(server, port, user, password):
     return client
 
 def dir_scanner():
+    """
+        Description: This function checks whether any file is deleted, added or modified in its repository
+    """
     # while True:
     temp = os.listdir('./volume')
     new_files = [file for file in temp if file not in obj.dir_list]
@@ -125,14 +151,12 @@ def Main():
     dir_scanner()
     while True:
         c, addr = s.accept()
-        data = c.recv(2048).decode('utf-8')
-        data1 = data.split(' ')
         print('Connected to :', addr[0], ':', addr[1])
         log_file = open('log', 'a')
         log_file.write("Connected " + str(addr[0])+"\n")
         log_file.close()
         # addr
-        ip_list[addr[0]] = data1
+        ip_list[addr[0]] = True
         start_new_thread(threaded, (c,addr[0]))
         print(ip_list)
     s.close()
