@@ -6,7 +6,7 @@ _pycache_/
 # C extensions
 *.so
 
-temp/
+volume/
 ssh/
 log
 # Distribution / packaging
