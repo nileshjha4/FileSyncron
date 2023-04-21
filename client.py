@@ -150,7 +150,7 @@ def Main1():
     global master
     master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9001')
 
-    port = 8085
+    # port = 8085
     # pdb.set_trace()
     global s 
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
