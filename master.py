@@ -5,6 +5,7 @@ import paramiko
 from paramiko import SSHClient
 from scp import SCPClient
 from _thread import *
+from config import *
 import threading
 ip_list = dict()
 ip_list_old = []
@@ -31,11 +32,11 @@ class Master(object):
                 self.del_files[k].append(ip)
 
                 if len(self.del_files[k]) == len(ip_list):
-                    os.remove('./volume/' + k)
+                    os.remove(REMOTE_PATH + '/' + k)
                     del self.del_files[k]
                     print('--> Deleted File', k)
             elif len(ip_list) == 1:
-                os.remove('./volume/' + k)
+                os.remove(REMOTE_PATH + '/' + k)
                 del self.del_files[k]
                 print('--> Deleted File', k)
         return ' '.join(temp)
@@ -100,7 +101,7 @@ def dir_scanner():
         Description: This function checks whether any file is deleted, added or modified in its repository
     """
     # while True:
-    temp = os.listdir('./volume')
+    temp = os.listdir(REMOTE_PATH)
     new_files = [file for file in temp if file not in obj.dir_list]
     for i in new_files:
         obj.dir_list.append(i)
@@ -120,7 +121,7 @@ def threaded(c,ip):
                 log_file.close()
                 obj.del_files[i]= [ip]
                 print(obj.del_files)
-                print('./volume/'+i)
+                print(REMOTE_PATH+'/'+i)
                 obj.dir_list.remove(i)
 
         elif msg[0] == 'add':
@@ -169,9 +170,24 @@ def pyro_func(obj):
     Pyro5.api.serve({}, host='0.0.0.0', port=9001, daemon=daemon, use_ns=False, verbose=True)
     print("2")
 
+
+def check_initial_dir():
+    if(os.path.exists(REMOTE_PATH)):
+        return
+    else:
+        # curr_path = str(os.getcwd())
+        # print(curr_path)
+        # direct = "volume"
+        # path = os.path.join(curr_path, direct)
+        mode =0o6666
+        os.mkdir(REMOTE_PATH, mode)
+    
+
+
 # if __name__ == '__main__':
 obj = Master()
 port = int(sys.argv[1])
+check_initial_dir()
 start_new_thread(pyro_func, (obj,))
 Main()
     
