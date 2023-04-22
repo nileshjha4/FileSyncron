@@ -151,6 +151,18 @@ def detect_modified_files_from_master():
                 current_hashes[file] = hashed.get_hash(LOCAL_PATH+'/'+file)
                 
 
+def check_initial_dir():
+    if(os.path.exists("./volume")):
+        return
+    else:
+        curr_path = str(os.getcwd())
+        print(curr_path)
+        direct = "volume"
+        path = os.path.join(curr_path, direct)
+        mode =0o6666
+        os.mkdir(path, mode)
+
+
 def Main1():
     global master
     master = Pyro5.api.Proxy('PYRO:file_syncron@' + ip_add + ':9001')
@@ -172,6 +184,8 @@ def Main1():
 
 ip_add = sys.argv[1]
 port = int(sys.argv[2])
+
+check_initial_dir()
 
 connected = False
 while not connected:
