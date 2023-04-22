@@ -1,0 +1,4 @@
+Pyro5
+paramiko
+python-dotenv
+scp

@@ -110,30 +110,32 @@ def threaded(c,ip):
     while True:
         data = c.recv(8192).decode('utf-8')
         msg = data.split(' ')
-        print(msg)
+        # print(msg)
         if msg[0] == 'delete':
             del msg[-1]
             for i in msg[1:]:
-                print(i,obj.dir_list)
+                # print(i,obj.dir_list)
+                print("--> Recieved request to delete file", i)
                 log_msg = 'delete ' + i + ' ' + ip + '\n'
                 log_file = open('log','a')
                 log_file.write(log_msg)
                 log_file.close()
                 obj.del_files[i]= [ip]
-                print(obj.del_files)
-                print(REMOTE_PATH+'/'+i)
+                # print(obj.del_files)
+                # print(REMOTE_PATH+'/'+i)
                 obj.dir_list.remove(i)
 
         elif msg[0] == 'add':
             del msg[-1]
             for i in msg[1:]:
                 if i not in obj.dir_list:
+                    print("--> Recieved request to add file", i)
                     log_msg = 'add ' + i + ' ' + ip + '\n'
                     log_file = open('log','a')
                     log_file.write(log_msg)
                     log_file.close()
                     obj.dir_list.append(i)
-            print(obj.dir_list)
+            # print(obj.dir_list)
         if not data:
             print('Bye')
             break
@@ -166,9 +168,9 @@ def pyro_func(obj):
     daemon = Pyro5.api.Daemon(host='0.0.0.0', port=9001)
     uri = daemon.register(obj,"file_syncron")
     # print(uri)
-    print("1")
+    # print("1")
     Pyro5.api.serve({}, host='0.0.0.0', port=9001, daemon=daemon, use_ns=False, verbose=True)
-    print("2")
+    # print("2")
 
 
 def check_initial_dir():

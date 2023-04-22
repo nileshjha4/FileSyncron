@@ -177,7 +177,7 @@ def Main1():
     scp.get(local_path = './', remote_path = REMOTE_PATH, recursive = True)
     scp.put(LOCAL_PATH, remote_path = REMOTE_PATH[:REMOTE_PATH.rfind('/')], recursive = True)
     scp.close()  
-    print("All files uploaded from Master")
+    print("All files downloaded from Master")
     while True:
         dir_scanner(s)
     s.close()
