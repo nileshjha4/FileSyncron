@@ -152,7 +152,6 @@ def detect_modified_files_from_master():
                 
 
 def check_initial_dir():
-<<<<<<< HEAD
     if(os.path.exists(LOCAL_PATH)):
         return
     else:
@@ -162,17 +161,6 @@ def check_initial_dir():
         # path = os.path.join(curr_path, direct)
         mode =0o6666
         os.mkdir(LOCAL_PATH, mode)
-=======
-    if(os.path.exists("./volume")):
-        return
-    else:
-        curr_path = str(os.getcwd())
-        print(curr_path)
-        direct = "volume"
-        path = os.path.join(curr_path, direct)
-        mode =0o6666
-        os.mkdir(path, mode)
->>>>>>> 9cbf0909153765d0ea56460a402c505901157b7a
 
 
 def Main1():
