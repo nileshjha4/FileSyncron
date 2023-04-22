@@ -91,7 +91,7 @@ def dir_scanner(s):
         hash_of_file = hashed.get_hash(LOCAL_PATH + '/' + file)
         if file in dir_list and hash_of_file != current_hashes[file]:
             modified_files.append(file)
-            print(file,hash_of_file,current_hashes[file])
+            # print(file,hash_of_file,current_hashes[file])
         current_hashes[file] = hash_of_file 
     
     delete_file(deleted_files, s)
@@ -128,7 +128,7 @@ def detect_new_files_from_master():
                 ssh = createSSHClient(ip_add, '22', USER_NAME, PASSWORD)
                 scp = SCPClient(ssh.get_transport())
                 # scp.get(LOCAL_PATH = './volume/'+file, remote_path = REMOTE_PATH + '/' +file, recursive = False)
-                scp.get(LOCAL_PATH = LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive = False)
+                scp.get(local_path= LOCAL_PATH+'/'+file, remote_path = REMOTE_PATH + '/' +file, recursive = False)
                 scp.close()
 
 def detect_modified_files_from_master():  
